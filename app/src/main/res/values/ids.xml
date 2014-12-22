@@ -1,0 +1,9 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <item name="list_item_message_primary" type="id" />
+    <item name="list_item_message_secondary1" type="id" />
+    <item name="badge" type="id" />
+    <item name="list_item_message_secondary2" type="id" />
+    <item name="avatar" type="id" />
+    <item name="list_item_message_topright" type="id" />
+</resources>
