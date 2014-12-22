@@ -40,7 +40,7 @@ public class MainFragment extends ListFragment {
     public static final int CHINA_UNICOM = 0;
     public static final int CHINA_TELECOM = 1;
     public static final int CHINA_MOBILE = 2;
-    private ArrayList<MissedCall> mMissedCalls;
+    private List<MissedCall> mMissedCalls;
     private QueryHandler mQueryHandler;
 
 
@@ -94,27 +94,27 @@ public class MainFragment extends ListFragment {
                 if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
                     sms.address = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.ADDRESS));
                     sms.body = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.BODY));
-                    sms.date_sent = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE_SENT));
-                    if (sms.date_sent.equals("0")) {
-                        sms.date_sent = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE));
+                    sms.dateSent = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE_SENT));
+                    if (sms.dateSent.equals("0")) {
+                        sms.dateSent = cursor.getString(cursor.getColumnIndexOrThrow(Telephony.Sms.DATE));
                     }
                 } else {
                     sms.address = cursor.getString(cursor.getColumnIndexOrThrow("address"));
                     sms.body = cursor.getString(cursor.getColumnIndexOrThrow("body"));
-                    sms.date_sent = cursor.getString(cursor.getColumnIndexOrThrow("date_sent"));
-                    if (sms.date_sent.equals("0")) {
-                        sms.date_sent = cursor.getString(cursor.getColumnIndexOrThrow("date"));
+                    sms.dateSent = cursor.getString(cursor.getColumnIndexOrThrow("date_sent"));
+                    if (sms.dateSent.equals("0")) {
+                        sms.dateSent = cursor.getString(cursor.getColumnIndexOrThrow("date"));
                     }
                 }
 
-                ArrayList<String> integers = new ArrayList<String>();
+                List<String> integers = new ArrayList<>();
                 Matcher matcher = Pattern.compile("\\d+").matcher(sms.body);
                 while (matcher.find()) {
                     integers.add(matcher.group());
                 }
                 final MissedCall missedCall = new MissedCall();
                 if (carrier == CHINA_UNICOM) {
-                    missedCall.missedCallTime = getDate(Long.parseLong(sms.date_sent)) + " " + integers.get(0) + ":" + integers.get(1);
+                    missedCall.missedCallTime = getDate(Long.parseLong(sms.dateSent)) + " " + integers.get(0) + ":" + integers.get(1);
                     missedCall.missedCallNumber = integers.get(2);
                 } else {
                     missedCall.missedCallNumber = integers.get(0);
@@ -133,10 +133,78 @@ public class MainFragment extends ListFragment {
         }
     }
 
+    private void fillListItem(List<Object> objects) {
+        QuickContactBadge badge = (QuickContactBadge) objects.get(0);
+        ImageView imageView = (ImageView) objects.get(1);
+        TextView primary = (TextView) objects.get(2);
+        TextView secondary1 = (TextView) objects.get(3);
+        TextView secondary2 = (TextView) objects.get(4);
+        MissedCall missedCall = (MissedCall) objects.get(5);
+        TextView topRight = (TextView) objects.get(6);
+        View view = (View) objects.get(7);
+
+        secondary2.setText(missedCall.missedCallTime);
+        switch (missedCall.carrier) {
+            case CHINA_UNICOM:
+                topRight.setText(getString(R.string.unicom));
+                break;
+            case CHINA_TELECOM:
+                topRight.setText(getString(R.string.telecom));
+                break;
+            case CHINA_MOBILE:
+                topRight.setText(getString(R.string.mobile));
+                break;
+        }
+        secondary1.setText(missedCall.missedCallNumber);
+        primary.setText(missedCall.displayName);
+
+        if (missedCall.displayName != null) {
+            //Found contact, change layout to 3 lines
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, getResources().getDisplayMetrics());
+            view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, height));
+
+            secondary1.setVisibility(View.VISIBLE);
+
+            RelativeLayout.LayoutParams secondary2Params = (RelativeLayout.LayoutParams) secondary2.getLayoutParams();
+            //Remove below whatever rule
+            secondary2Params.addRule(RelativeLayout.BELOW, secondary1.getId());
+            secondary2.setLayoutParams(secondary2Params);
+
+            //SET TEXT
+            badge.assignContactUri(missedCall.lookupUri);
+        } else {
+            //Didn't find contact, 2 line layout
+            int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 72, getResources().getDisplayMetrics());
+            view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, height));
+
+            secondary1.setVisibility(View.GONE);
+
+            RelativeLayout.LayoutParams secondary2Params = (RelativeLayout.LayoutParams) secondary2.getLayoutParams();
+            secondary2Params.addRule(RelativeLayout.BELOW, primary.getId());
+            secondary2.setLayoutParams(secondary2Params);
+
+            //SET TEXT
+            primary.setText(missedCall.missedCallNumber);
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
+                Bundle extra = new Bundle();
+                extra.putString(ContactsContract.Intents.Insert.PHONE, missedCall.missedCallNumber);
+                badge.assignContactFromPhone(missedCall.missedCallNumber, true, extra);
+            } else {
+                badge.assignContactFromPhone(missedCall.missedCallNumber, true);
+            }
+        }
+
+        if (missedCall.thumbnail != null) {
+            imageView.setImageBitmap(missedCall.thumbnail);
+        } else {
+            imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_contact_picture));
+        }
+    }
+
     public class Sms {
         public String address;
         public String body;
-        public String date_sent;
+        public String dateSent;
     }
 
     public class MissedCall {
@@ -184,15 +252,19 @@ public class MainFragment extends ListFragment {
             objects.add(topRight);
             objects.add(convertView);
 
-            mQueryHandler.startQuery(
-                    0,
-                    objects,
-                    Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(missedCall.missedCallNumber)),
-                    new String[]{ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.LOOKUP_KEY, ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI},
-                    null,
-                    null,
-                    null
-            );
+            if (!missedCall.contactInitialized) {
+                mQueryHandler.startQuery(
+                        0,
+                        objects,
+                        Uri.withAppendedPath(ContactsContract.PhoneLookup.CONTENT_FILTER_URI, Uri.encode(missedCall.missedCallNumber)),
+                        new String[]{ContactsContract.PhoneLookup._ID, ContactsContract.PhoneLookup.LOOKUP_KEY, ContactsContract.PhoneLookup.DISPLAY_NAME, ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI},
+                        null,
+                        null,
+                        null
+                );
+            } else {
+                fillListItem(objects);
+            }
 
 
             return convertView;
@@ -274,96 +346,34 @@ public class MainFragment extends ListFragment {
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
             if (cookie != null) {
-                ArrayList<Object> extras = (ArrayList<Object>) cookie;
-                QuickContactBadge badge = (QuickContactBadge) extras.get(0);
-                ImageView imageView = (ImageView) extras.get(1);
-                TextView primary = (TextView) extras.get(2);
-                TextView secondary1 = (TextView) extras.get(3);
-                TextView secondary2 = (TextView) extras.get(4);
+                List<Object> extras = (ArrayList<Object>) cookie;
                 MissedCall missedCall = (MissedCall) extras.get(5);
-                TextView topRight = (TextView) extras.get(6);
-                View view = (View) extras.get(7);
 
-                if (!missedCall.contactInitialized) {
-                    String id = null;
-                    String lookupKey = null;
-                    String displayName = null;
-                    String thumbnailUri = null;
-                    if (cursor.moveToFirst()) {
-                        id = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID));
-                        lookupKey = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.LOOKUP_KEY));
-                        displayName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
-                        thumbnailUri = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                String id = null;
+                String lookupKey = null;
+                String displayName = null;
+                String thumbnailUri = null;
+                if (cursor.moveToFirst()) {
+                    id = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup._ID));
+                    lookupKey = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.LOOKUP_KEY));
+                    displayName = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.DISPLAY_NAME));
+                    thumbnailUri = cursor.getString(cursor.getColumnIndexOrThrow(ContactsContract.PhoneLookup.PHOTO_THUMBNAIL_URI));
+                }
+
+                boolean exists = id != null;
+                if (exists) {
+                    missedCall.displayName = displayName;
+                    if (thumbnailUri != null) {
+                        missedCall.thumbnail = Utils.loadContactPhotoThumbnail(thumbnailUri, getActivity());
                     }
-
-                    cursor.close();
-
-                    boolean exists = id != null;
-                    if (exists) {
-                        missedCall.displayName = displayName;
-                        if (thumbnailUri != null) {
-                            missedCall.thumbnail = Utils.loadContactPhotoThumbnail(thumbnailUri, getActivity());
-                        }
-                        missedCall.lookupUri = ContactsContract.Contacts.getLookupUri(Long.parseLong(id), lookupKey);
-                    }
+                    missedCall.lookupUri = ContactsContract.Contacts.getLookupUri(Long.parseLong(id), lookupKey);
                 }
 
-                secondary2.setText(missedCall.missedCallTime);
-                switch (missedCall.carrier) {
-                    case CHINA_UNICOM:
-                        topRight.setText(getString(R.string.unicom));
-                        break;
-                    case CHINA_TELECOM:
-                        topRight.setText(getString(R.string.telecom));
-                        break;
-                    case CHINA_MOBILE:
-                        topRight.setText(getString(R.string.mobile));
-                        break;
-                }
-                secondary1.setText(missedCall.missedCallNumber);
-                primary.setText(missedCall.displayName);
+                missedCall.contactInitialized = true;
 
-                if (missedCall.displayName != null) {
-                    //Found contact, change layout to 3 lines
-                    int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 88, getResources().getDisplayMetrics());
-                    view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, height));
+                cursor.close();
 
-                    secondary1.setVisibility(View.VISIBLE);
-
-                    RelativeLayout.LayoutParams secondary2Params = (RelativeLayout.LayoutParams) secondary2.getLayoutParams();
-                    //Remove below whatever rule
-                    secondary2Params.addRule(RelativeLayout.BELOW, secondary1.getId());
-                    secondary2.setLayoutParams(secondary2Params);
-
-                    //SET TEXT
-                    badge.assignContactUri(missedCall.lookupUri);
-                } else {
-                    //Didn't find contact, 2 line layout
-                    int height = (int) TypedValue.applyDimension(TypedValue.COMPLEX_UNIT_DIP, 72, getResources().getDisplayMetrics());
-                    view.setLayoutParams(new AbsListView.LayoutParams(AbsListView.LayoutParams.MATCH_PARENT, height));
-
-                    secondary1.setVisibility(View.GONE);
-
-                    RelativeLayout.LayoutParams secondary2Params = (RelativeLayout.LayoutParams) secondary2.getLayoutParams();
-                    secondary2Params.addRule(RelativeLayout.BELOW, primary.getId());
-                    secondary2.setLayoutParams(secondary2Params);
-
-                    //SET TEXT
-                    primary.setText(missedCall.missedCallNumber);
-                    if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.JELLY_BEAN_MR2) {
-                        Bundle extra = new Bundle();
-                        extra.putString(ContactsContract.Intents.Insert.PHONE, missedCall.missedCallNumber);
-                        badge.assignContactFromPhone(missedCall.missedCallNumber, true, extra);
-                    } else {
-                        badge.assignContactFromPhone(missedCall.missedCallNumber, true);
-                    }
-                }
-
-                if (missedCall.thumbnail != null) {
-                    imageView.setImageBitmap(missedCall.thumbnail);
-                } else {
-                    imageView.setImageDrawable(getResources().getDrawable(R.drawable.ic_contact_picture));
-                }
+                fillListItem(extras);
             }
         }
     }
