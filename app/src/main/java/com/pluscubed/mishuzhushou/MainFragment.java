@@ -142,6 +142,11 @@ public class MainFragment extends ListFragment {
         MissedCall missedCall = (MissedCall) objects.get(5);
         TextView topRight = (TextView) objects.get(6);
         View view = (View) objects.get(7);
+        RelativeLayout progressRelative = (RelativeLayout) objects.get(8);
+        RelativeLayout listItemRelative = (RelativeLayout) objects.get(9);
+
+        progressRelative.setVisibility(View.GONE);
+        listItemRelative.setVisibility(View.VISIBLE);
 
         secondary2.setText(missedCall.missedCallTime);
         switch (missedCall.carrier) {
@@ -240,7 +245,8 @@ public class MainFragment extends ListFragment {
             TextView secondary1 = (TextView) convertView.findViewById(R.id.list_item_message_secondary1);
             TextView secondary2 = (TextView) convertView.findViewById(R.id.list_item_message_secondary2);
             TextView topRight = (TextView) convertView.findViewById(R.id.list_item_message_topright);
-
+            RelativeLayout progressRelative = (RelativeLayout) convertView.findViewById(R.id.progress_bar_relative);
+            RelativeLayout listItemRelative = (RelativeLayout) convertView.findViewById(R.id.list_item_relative);
 
             List<Object> objects = new ArrayList<>();
             objects.add(badge);
@@ -251,8 +257,12 @@ public class MainFragment extends ListFragment {
             objects.add(missedCall);
             objects.add(topRight);
             objects.add(convertView);
+            objects.add(progressRelative);
+            objects.add(listItemRelative);
 
             if (!missedCall.contactInitialized) {
+                progressRelative.setVisibility(View.VISIBLE);
+                listItemRelative.setVisibility(View.GONE);
                 mQueryHandler.startQuery(
                         0,
                         objects,

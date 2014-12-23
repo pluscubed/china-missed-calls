@@ -6,4 +6,6 @@
     <item name="list_item_message_secondary2" type="id" />
     <item name="avatar" type="id" />
     <item name="list_item_message_topright" type="id" />
+    <item name="progress_bar_relative" type="id" />
+    <item name="list_item_relative" type="id" />
 </resources>
