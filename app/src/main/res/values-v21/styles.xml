@@ -1,11 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
 <resources>
 
-    <style name="Theme.MiShuZhuShou" parent="Theme.AppCompat.Light.NoActionBar">
+<style name="Theme.MiShuZhuShou" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="colorPrimary">@color/primary_material_dark</item>
         <item name="colorPrimaryDark">@color/primary_dark_material_dark</item>
-
-        <item name="toolbarShadow">@drawable/shadow</item>
+        <item name="toolbarShadow">@null</item>
         <item name="android:windowContentOverlay">@null</item>
     </style>
-
 </resources>

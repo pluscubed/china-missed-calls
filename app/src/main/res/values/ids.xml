@@ -4,8 +4,11 @@
     <item name="list_item_message_secondary1" type="id" />
     <item name="badge" type="id" />
     <item name="list_item_message_secondary2" type="id" />
+    <item name="list_item_message_text" type="id" />
     <item name="avatar" type="id" />
     <item name="list_item_message_topright" type="id" />
     <item name="progress_bar_relative" type="id" />
     <item name="list_item_relative" type="id" />
+    <item name="toolbar_actionbar" type="id" />
+    <item name="activity_main_content_framelayout" type="id" />
 </resources>
