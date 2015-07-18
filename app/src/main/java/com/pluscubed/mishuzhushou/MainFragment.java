@@ -11,8 +11,10 @@ import android.os.Build;
 import android.os.Bundle;
 import android.provider.ContactsContract;
 import android.provider.Telephony;
+import android.support.annotation.NonNull;
 import android.support.v4.content.ContextCompat;
 import android.util.TypedValue;
+import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.AbsListView;
@@ -35,6 +37,7 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
 
     private List<MissedCall> mMissedCalls;
     private ContactQueryHandler mContactQueryHandler;
+    private TextView mEmptyTextView;
 
 
     @Override
@@ -45,9 +48,17 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
         final LoaderManager.LoaderCallbacks<Cursor> loaderCallbacks = new SmsLoaderCallbacks();
         getLoaderManager().initLoader(Utils.CHINA_UNICOM, null, loaderCallbacks);
         setListAdapter(new ContactsMissedCallAdapter());
+
+        //TODO: get rid of this atrocity
         setRetainInstance(true);
     }
 
+    @Override
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        View view = inflater.inflate(R.layout.fragment_main, container, false);
+        mEmptyTextView = (TextView) view.findViewById(android.R.id.empty);
+        return view;
+    }
 
     @Override
     public void onResume() {
@@ -56,10 +67,14 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
     }
 
     @Override
+    public void setEmptyText(CharSequence text) {
+        mEmptyTextView.setText(text);
+    }
+
+    @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         setEmptyText("加载中。。。");
-        getListView().setDividerHeight(0);
     }
 
     public void updateList() {

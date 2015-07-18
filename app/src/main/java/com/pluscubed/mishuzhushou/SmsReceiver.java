@@ -14,7 +14,6 @@ import android.provider.Telephony;
 import android.support.v7.app.NotificationCompat;
 import android.telephony.SmsMessage;
 import android.widget.QuickContactBadge;
-import android.widget.Toast;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -38,14 +37,6 @@ public class SmsReceiver extends BroadcastReceiver {
                     messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
                 }
                 for (SmsMessage message : messages) {
-                    String strMessageFrom = message.getDisplayOriginatingAddress();
-                    String strMessageBody = message.getDisplayMessageBody();
-
-                    Toast.makeText(context, "SMS Message received from:" + strMessageFrom, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(context, "SMS Message content" + strMessageBody, Toast.LENGTH_SHORT).show();
-                    Toast.makeText(context, "SMS Message received from:" + message.getOriginatingAddress(), Toast.LENGTH_SHORT).show();
-                    Toast.makeText(context, "SMS Messageasdf:" + message.getMessageBody(), Toast.LENGTH_SHORT).show();
-
                     showNotification(context, message);
                 }
             }
