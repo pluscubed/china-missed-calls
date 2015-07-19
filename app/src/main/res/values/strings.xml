@@ -1,9 +1,9 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">漏电短信</string>
+    <string name="app_name">漏接电话</string>
     <string name="avatar_description">头像</string>
     <string name="unicom">联通短信</string>
     <string name="telecom">电信短信</string>
     <string name="mobile">移动短信</string>
-    <string name="missed_call">漏电短信：</string>
+    <string name="missed_call">漏接电话：</string>
 </resources>
