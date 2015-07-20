@@ -100,11 +100,13 @@ public class SmsReceiver extends BroadcastReceiver {
                             .setContentIntent(pendingIntent);
 
                     if (missedCall.displayName != null) {
-                        int width = (int) context.getResources().getDimension(android.R.dimen.notification_large_icon_width);
-                        int height = (int) context.getResources().getDimension(android.R.dimen.notification_large_icon_height);
-                        notification.setLargeIcon(Utils.getCircleBitmap(Bitmap.createScaledBitmap(missedCall.thumbnail, width, height, false)))
-                                .setContentTitle(missedCall.displayName + "（" + Utils.formatPhoneNumber(missedCall.missedCallNumber) + "）")
+                        notification.setContentTitle(missedCall.displayName + "（" + Utils.formatPhoneNumber(missedCall.missedCallNumber) + "）")
                                 .addPerson(missedCall.lookupUri.toString());
+                        if (missedCall.thumbnail != null) {
+                            int width = (int) context.getResources().getDimension(android.R.dimen.notification_large_icon_width);
+                            int height = (int) context.getResources().getDimension(android.R.dimen.notification_large_icon_height);
+                            notification.setLargeIcon(Utils.getCircleBitmap(Bitmap.createScaledBitmap(missedCall.thumbnail, width, height, false)));
+                        }
                     } else {
                         notification.setContentTitle(Utils.formatPhoneNumber(missedCall.missedCallNumber));
                     }
