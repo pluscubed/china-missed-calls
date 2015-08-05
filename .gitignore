@@ -21,5 +21,5 @@ local.properties
 ## Plugin-specific files:
 
 # Crashlytics plugin (for Android Studio and IntelliJ)
-crashlytics.properties
+fabric.properties
 crashlytics-build.properties

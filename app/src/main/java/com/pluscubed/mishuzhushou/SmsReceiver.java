@@ -25,6 +25,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     Telephony.Sms.Intents.SMS_RECEIVED_ACTION : "android.provider.Telephony.SMS_RECEIVED";
 
     public static final String NOTIFICATION_CLICKED_ACTION = "com.pluscubed.mishuzhushou.NOTIFICATION_CLICKED";
+    public static final int NOTIFICATION_ID = 0;
 
     @Override
     public void onReceive(Context context, Intent intent) {
@@ -41,6 +42,10 @@ public class SmsReceiver extends BroadcastReceiver {
                 }
             }
         } else if (intent.getAction().equals(NOTIFICATION_CLICKED_ACTION)) {
+            NotificationManager mNotificationManager =
+                    (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
+            mNotificationManager.cancel(NOTIFICATION_ID);
+
             MissedCall missedCall = intent.getParcelableExtra("missedCall");
             QuickContactBadge badge = new QuickContactBadge(context);
             if (missedCall.displayName != null) {
@@ -112,7 +117,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     }
                     NotificationManager mNotificationManager =
                             (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
-                    mNotificationManager.notify(0, notification.build());
+                    mNotificationManager.notify(NOTIFICATION_ID, notification.build());
                 }
             }).startQuery(
                     0,
