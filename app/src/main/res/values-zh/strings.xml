@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">漏接电话</string>
+    <string name="avatar_description">头像</string>
+    <string name="unicom">联通短信</string>
+    <string name="telecom">电信短信</string>
+    <string name="mobile">移动短信</string>
+    <string name="missed_call">漏接电话：</string>
+    <string name="loading">加载中。。。</string>
+    <string name="no_missed_call_sms">无漏电短信</string>
+    <string name="permission_needed">权限授权</string>
+    <string name="permission_needed_desc">漏接电话需要短信及通讯录权限。</string>
+    <string name="permission_denied">\n应用将会关闭。</string>
+</resources>

@@ -74,7 +74,7 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
     @Override
     public void onViewCreated(View view, Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        setEmptyText("加载中。。。");
+        setEmptyText(getString(R.string.loading));
     }
 
     public void updateList() {
@@ -139,6 +139,7 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
         secondary2.setText(Utils.getDateString(missedCall.missedCallTime));
         switch (missedCall.carrier) {
             case Utils.CHINA_UNICOM:
+            case Utils.CHINA_UNICOM_2:
                 topRight.setText(getString(R.string.unicom));
                 break;
             case Utils.CHINA_TELECOM:
@@ -245,6 +246,8 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
                 case Utils.CHINA_UNICOM:
                     filter = "联通秘书在%为您接待了一位访客%";
                     break;
+                case Utils.CHINA_UNICOM_2:
+                    filter = "尊敬的用户您好: 联通漏话提示服务提醒您%于%联系过您";
                 case Utils.CHINA_TELECOM:
                     filter = "%在%呼叫过您的手机%";
                     break;
@@ -282,6 +285,10 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
             switch (loader.getId()) {
                 case Utils.CHINA_UNICOM:
                     addMissedCalls(data, loader.getId());
+                    getLoaderManager().initLoader(Utils.CHINA_UNICOM_2, null, this);
+                    break;
+                case Utils.CHINA_UNICOM_2:
+                    addMissedCalls(data, loader.getId());
                     getLoaderManager().initLoader(Utils.CHINA_TELECOM, null, this);
                     break;
                 case Utils.CHINA_TELECOM:
@@ -291,7 +298,7 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
                 case Utils.CHINA_MOBILE:
                     addMissedCalls(data, loader.getId());
                     if (mMissedCalls.size() == 0) {
-                        setEmptyText("无漏电短信");
+                        setEmptyText(getString(R.string.no_missed_call_sms));
                     }
                     break;
                 default:

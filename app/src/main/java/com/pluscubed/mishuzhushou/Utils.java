@@ -35,6 +35,7 @@ public class Utils {
     public static final int CHINA_UNICOM = 0;
     public static final int CHINA_TELECOM = 1;
     public static final int CHINA_MOBILE = 2;
+    public static final int CHINA_UNICOM_2 = 3;
 
     public static Bitmap loadContactPhotoThumbnail(String photoData, Context context) {
 
@@ -121,6 +122,12 @@ public class Utils {
             calendar.set(Calendar.MINUTE, Integer.parseInt(integers.get(1)));
             missedCall.missedCallTime = calendar.getTimeInMillis();
             missedCall.missedCallNumber = integers.get(2);
+        } else if (carrier == CHINA_UNICOM_2) {
+            missedCall.missedCallNumber = integers.get(0);
+            Calendar calendar = Calendar.getInstance();
+            //noinspection ResourceType
+            calendar.set(Integer.parseInt(integers.get(1)), Integer.parseInt(integers.get(2)) - 1, Integer.parseInt(integers.get(3)), Integer.parseInt(integers.get(4)), Integer.parseInt(integers.get(5)));
+            missedCall.missedCallTime = calendar.getTimeInMillis();
         } else {
             missedCall.missedCallNumber = integers.get(0);
             Calendar calendar = Calendar.getInstance();
@@ -148,7 +155,7 @@ public class Utils {
         }
     }
 
-    @IntDef({CHINA_UNICOM, CHINA_TELECOM, CHINA_MOBILE})
+    @IntDef({CHINA_UNICOM, CHINA_UNICOM_2, CHINA_TELECOM, CHINA_MOBILE})
     public @interface Carrier {
     }
 }
