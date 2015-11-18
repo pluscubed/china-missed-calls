@@ -14,7 +14,6 @@ import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.support.v7.app.NotificationCompat;
 import android.telephony.SmsMessage;
-import android.widget.QuickContactBadge;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -85,6 +84,8 @@ public class SmsReceiver extends BroadcastReceiver {
             carrier = Utils.CHINA_TELECOM;
         } else if (message.getMessageBody().matches("中国移动.*公司来电提醒.*于.*呼叫过您")) {
             carrier = Utils.CHINA_MOBILE;
+        } else if (message.getMessageBody().matches("尊敬的用户您好: 联通漏话提示服务提醒您.*于.*联系过您")) {
+            carrier = Utils.CHINA_UNICOM_2;
         }
 
         if (carrier != -1) {

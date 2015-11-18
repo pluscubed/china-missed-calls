@@ -21,7 +21,6 @@ import android.widget.AbsListView;
 import android.widget.ArrayAdapter;
 import android.widget.BaseAdapter;
 import android.widget.ListView;
-import android.widget.QuickContactBadge;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 
@@ -248,6 +247,7 @@ public class MainFragment extends ListFragment implements ContactQueryHandler.On
                     break;
                 case Utils.CHINA_UNICOM_2:
                     filter = "尊敬的用户您好: 联通漏话提示服务提醒您%于%联系过您";
+                    break;
                 case Utils.CHINA_TELECOM:
                     filter = "%在%呼叫过您的手机%";
                     break;
