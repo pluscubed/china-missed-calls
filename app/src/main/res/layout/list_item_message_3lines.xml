@@ -33,7 +33,7 @@
             android:scaleType="center"
             app:riv_oval="true" />
 
-        <QuickContactBadge
+        <com.pluscubed.mishuzhushou.QuickContactBadge
             android:id="@id/badge"
             android:layout_width="0dp"
             android:layout_height="0dp"

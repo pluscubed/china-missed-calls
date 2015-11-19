@@ -1,5 +1,6 @@
 package com.pluscubed.mishuzhushou;
 
+import android.annotation.SuppressLint;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.BroadcastReceiver;
@@ -13,34 +14,41 @@ import android.provider.ContactsContract;
 import android.provider.Telephony;
 import android.support.v7.app.NotificationCompat;
 import android.telephony.SmsMessage;
-import android.widget.QuickContactBadge;
 
 import java.util.ArrayList;
 import java.util.List;
 
 public class SmsReceiver extends BroadcastReceiver {
 
+    @SuppressLint("InlinedApi")
     public static final String SMS_RECEIVED_ACTION =
             Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT ?
                     Telephony.Sms.Intents.SMS_RECEIVED_ACTION : "android.provider.Telephony.SMS_RECEIVED";
 
     public static final String NOTIFICATION_CLICKED_ACTION = "com.pluscubed.mishuzhushou.NOTIFICATION_CLICKED";
     public static final int NOTIFICATION_ID = 0;
+    public static final String EXTRA_MISSED_CALL_CLICKED = "missedCall";
 
     @Override
     public void onReceive(Context context, Intent intent) {
         if (intent.getAction().equals(SMS_RECEIVED_ACTION)) {
-            Bundle bundle = intent.getExtras();
-            if (bundle != null) {
-                Object[] pdus = (Object[]) bundle.get("pdus");
-                SmsMessage[] messages = new SmsMessage[pdus.length];
+            SmsMessage[] messages;
+
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.KITKAT) {
+                messages = Telephony.Sms.Intents.getMessagesFromIntent(intent);
+            } else {
+                Object[] pdus = (Object[]) intent.getSerializableExtra("pdus");
+                messages = new SmsMessage[pdus.length];
                 for (int i = 0; i < pdus.length; i++) {
+                    //noinspection deprecation
                     messages[i] = SmsMessage.createFromPdu((byte[]) pdus[i]);
                 }
-                for (SmsMessage message : messages) {
-                    showNotification(context, message);
-                }
             }
+
+            for (SmsMessage message : messages) {
+                showNotification(context, message);
+            }
+
         } else if (intent.getAction().equals(NOTIFICATION_CLICKED_ACTION)) {
             NotificationManager mNotificationManager =
                     (NotificationManager) context.getSystemService(Context.NOTIFICATION_SERVICE);
@@ -76,6 +84,8 @@ public class SmsReceiver extends BroadcastReceiver {
             carrier = Utils.CHINA_TELECOM;
         } else if (message.getMessageBody().matches("中国移动.*公司来电提醒.*于.*呼叫过您")) {
             carrier = Utils.CHINA_MOBILE;
+        } else if (message.getMessageBody().matches("尊敬的用户您好: 联通漏话提示服务提醒您.*于.*联系过您")) {
+            carrier = Utils.CHINA_UNICOM_2;
         }
 
         if (carrier != -1) {
@@ -94,7 +104,7 @@ public class SmsReceiver extends BroadcastReceiver {
                     Context context = (Context) cookie.get(2);
 
                     Intent intent = new Intent(context, SmsReceiver.class);
-                    intent.putExtra("missedCall", missedCall);
+                    intent.putExtra(EXTRA_MISSED_CALL_CLICKED, missedCall);
                     intent.setAction(NOTIFICATION_CLICKED_ACTION);
                     PendingIntent pendingIntent = PendingIntent.getBroadcast(context, 0, intent, PendingIntent.FLAG_UPDATE_CURRENT);
 

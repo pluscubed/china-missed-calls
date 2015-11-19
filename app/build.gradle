@@ -12,22 +12,24 @@ apply plugin: 'io.fabric'
 
 repositories {
     maven { url 'https://maven.fabric.io/public' }
+    maven { url 'https://jitpack.io' }
 }
 
 
 android {
-    compileSdkVersion 22
-    buildToolsVersion "22.0.1"
+    compileSdkVersion 23
+    buildToolsVersion "23.0.2"
 
     defaultConfig {
         applicationId "com.pluscubed.mishuzhushou"
         minSdkVersion 14
-        targetSdkVersion 22
-        versionCode 2
-        versionName "1.0.1"
+        targetSdkVersion 23
+        versionCode 3
+        versionName "1.1.0"
     }
     if (project.hasProperty("RELEASE_STORE_FILE")) {
         signingConfigs {
+            //noinspection GroovyAssignabilityCheck
             release {
                 storeFile file(RELEASE_STORE_FILE)
                 storePassword RELEASE_STORE_PASSWORD
@@ -37,6 +39,7 @@ android {
         }
     }
     buildTypes {
+        //noinspection GroovyMissingReturnStatement
         release {
             shrinkResources true
             minifyEnabled true
@@ -54,10 +57,11 @@ android {
 }
 
 dependencies {
-    compile 'com.android.support:appcompat-v7:22.+'
-    compile 'com.android.support:recyclerview-v7:22.+'
-    compile 'com.makeramen:roundedimageview:2.+'
-    compile('com.crashlytics.sdk.android:crashlytics:2.+@aar') {
+    compile 'com.github.afollestad.material-dialogs:core:0.8.5.1'
+    compile 'com.android.support:appcompat-v7:23.1.1'
+    compile 'com.android.support:recyclerview-v7:23.1.1'
+    compile 'com.makeramen:roundedimageview:2.2.1'
+    compile('com.crashlytics.sdk.android:crashlytics:2.5.2@aar') {
         transitive = true;
     }
 }

@@ -1,9 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="app_name">漏接电话</string>
-    <string name="avatar_description">头像</string>
-    <string name="unicom">联通短信</string>
-    <string name="telecom">电信短信</string>
-    <string name="mobile">移动短信</string>
-    <string name="missed_call">漏接电话：</string>
+    <string name="app_name">China Missed Calls</string>
+    <string name="avatar_description">Avatar</string>
+    <string name="unicom">China Unicom SMS</string>
+    <string name="telecom">China Telecom SMS</string>
+    <string name="mobile">China Mobile SMS</string>
+    <string name="missed_call">"Missed Call: "</string>
+    <string name="loading">Loading…</string>
+    <string name="no_missed_call_sms">No missed call SMSes</string>
+    <string name="permission_needed">Permissions Needed</string>
+    <string name="permission_needed_desc">Permissions to access your phone\'s SMSes and contacts are needed.</string>
+    <string name="permission_denied">\nChina Missed Calls will now close.</string>
 </resources>
